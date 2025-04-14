@@ -14,22 +14,16 @@ Servo FIRE;
 //Global Variables
 int ANGLE_RESET = 0;
 int FIRE_RESET = 90;
-int BASE_SPEED = 0;
 
 //Other Global Bariables
-int VERTICAL_UPPER_LIMIT = 180;
+int VERTICAL_UPPER_LIMIT = 50;
 int VERTICAL_LOWER_LIMIT = 0;
 int HORIZONTAL_UPPER_LIMIT = 180;
 int HORIZONTAL_LOWER_LIMIT = 0;
-int FIRE_WAIT_TIME = 100;
 
 //Setup Global Angle-Tracking variables
 int VerticalServo;
 int HorizontalServo;
-int MotorSpeed;
-
-
-
 
 void setup() {
   //Begin Serial
