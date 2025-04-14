@@ -1,18 +1,5 @@
 #include <Servo.h>
-#include <TimerOne.h>
-
-
-
-//Define important addresses
-#define SLAVE_ADDRESS 0x08
-#define PIN_MOTOR_1_ENA 6
-#define PIN_MOTOR_2_ENB 5
-#define PIN_MOTOR_1_IN1 0
-#define PIN_MOTOR_1_IN2 1
-#define PIN_MOTOR_2_IN3 2
-#define PIN_MOTOR_2_IN4 4
-
-
+#include <ArduinoJson.h>
 
 //MAIN PIN SETUPS, DO NOT CHANGE:
 #define PIN_VERTICAL 10
@@ -63,123 +50,121 @@ void setup() {
     int VerticalServo = ANGLE_RESET;
     int HorizontalServo = ANGLE_RESET;
     int MotorSpeed = BASE_SPEED;
-
-    //Setup DC motors
-    pinMode(PIN_MOTOR_1_ENA, OUTPUT);
-    pinMode(PIN_MOTOR_2_ENB, OUTPUT);
-    pinMode(PIN_MOTOR_1_IN1, OUTPUT);
-    pinMode(PIN_MOTOR_1_IN2, OUTPUT);
-    pinMode(PIN_MOTOR_2_IN3, OUTPUT);
-    pinMode(PIN_MOTOR_2_IN4, OUTPUT);
-
-    //Set rotation direction
-    digitalWrite(PIN_MOTOR_1_IN1, LOW);
-    digitalWrite(PIN_MOTOR_1_IN2, HIGH);
-    digitalWrite(PIN_MOTOR_2_IN3, HIGH);
-    digitalWrite(PIN_MOTOR_2_IN4, LOW);
-
-    //Turn off motors
-    analogWrite(PIN_MOTOR_1_ENA, 0);
-    analogWrite(PIN_MOTOR_2_ENB, 0);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+  JsonDocument doc;
+  String inByte;
+  // read from port 1, send to port 0:
+  if (Serial.available() > 0) {
+    inByte = Serial.readString();
+  }
 
-  String incomingCommand = "";
+  DeserializationError error = deserializeJson(doc, inByte);
+
+  if (error) {
+    Response("Deserialization Error: " + error.f_str(), false);
+  }
+
+  String incomingCommand = doc["action"];
+  int parameter = doc["angle"];
+
 
   if(incomingCommand.equals("MOVEUP")){
+    MoveUp(parameter);
     incomingCommand = "";
   }
   else if(incomingCommand.equals("MOVEDOWN")){
+    MoveDown(parameter);
     incomingCommand = "";
   }
   else if(incomingCommand.equals("MOVERIGHT")){
+    MoveRight(parameter);
     incomingCommand = "";
   }
   else if(incomingCommand.equals("MOVELEFT")){
+    MoveLeft(parameter);
     incomingCommand = "";  
   }
   else if(incomingCommand.equals("FIRE")){
+    Fire();
     incomingCommand = "";
   }
-  else if(incomingCommand.equals("ARM")){
-    incomingCommand = "";
-  }
-  else if(incomingCommand.equals("DISARM")){
-    
-  }
+
 }
 
 void MoveUp(int degree){
   if ((VerticalServo + degree) > VERTICAL_UPPER_LIMIT){
     //return error
-    Serial.println("Vertical Degree delta amount too high");
+    Response("Move Up Delta amount too high: " + String(degree) + " degrees", false);
   }
   else{
     //go ahead and run command
     VerticalServo += degree;
     VERTICAL.write(VerticalServo);
+    Response("Move Down Successful: " + String(degree) + " degrees", true);
   }
 }
 
 void MoveDown(int degree){
   if ((VerticalServo - degree) < VERTICAL_LOWER_LIMIT){
     //return error
-    Serial.println("Vertical Degree delta amount too high");
+    Response("Move Down Delta amount too high: " + String(degree) + " degrees", false);
   }
   else{
     //go ahead and run command
     VerticalServo -= degree;
     VERTICAL.write(VerticalServo);
+    Response("Move Down Successful: " + String(degree) + " degrees", true);
   }
 }
 
 void MoveRight(int degree){
   if ((HorizontalServo + degree) > HORIZONTAL_UPPER_LIMIT){
     //return error
-    Serial.println("Degree delta amount too high");
+    Response("Move Right Delta amount too high: " + String(degree) + " degrees", false);
   }
   else{
     //go ahead and run command
-    VerticalServo += degree;
-    VERTICAL.write(VerticalServo);
+    HorizontalServo += degree;
+    VERTICAL.write(HorizontalServo);
+    Response("Move Right Successful: " + String(degree) + " degrees", true);
   }
 }
+
 void MoveLeft(int degree){
   if ((HorizontalServo - degree) < HORIZONTAL_LOWER_LIMIT){
     //return error
-    Serial.println("Degree delta amount too high");
+    Response("Move Left Delta amount too high: " + String(degree) + " degrees", false);
   }
   else{
     //go ahead and run command
-    VerticalServo -= degree;
-    VERTICAL.write(VerticalServo);
+    HorizontalServo -= degree;
+    VERTICAL.write(HorizontalServo);
+    Response("Move Left Successful", true);
   }
 }
-void Fire(){
-  FIRE.write(0);
-  delay(FIRE_WAIT_TIME);
-  FIRE.write(90);
-}
-void Arm(int mode){
-  int spinSpeed = 0;
-  if(mode == 1){
-    spinSpeed = 10;
-  }
-  else if (mode == 2){
-    spinSpeed = 50;
-  }
-  else if(mode == 3){
-    spinSpeed = 98;
-  }
 
-  Timer1.initialize(spinSpeed);//KHZ = spinSpeed / 10
-  Timer1.pwm(PIN_MOTOR_1_ENA, 512);
-  Timer1.pwm(PIN_MOTOR_2_ENB, 512);
+void Fire(){
   
+  FIRE.attach(PIN_FIRE);
+  FIRE.write(0);
+  delay(3000);
+  FIRE.write(90);
+  delay(500);
+  FIRE.write(180);
+  delay(3000);
+  FIRE.detach();
+
+  Response("Fire Successful", true);
+
 }
-void Disarm(){
-  analogWrite(PIN_MOTOR_1_ENA, 0);
-  analogWrite(PIN_MOTOR_2_ENB, 0);
+
+String Response(String message, bool successful){
+  JsonDocument docSuccess;
+  docSuccess["success"] = successful;
+  docSuccess["message"] = message;
+
+  Serial.println(serializeJson(docSuccess, Serial));
 }
