@@ -25,6 +25,8 @@ int HORIZONTAL_LOWER_LIMIT = 0;
 int VerticalServo;
 int HorizontalServo;
 
+int BASE_SPEED = 0;
+
 void setup() {
   //Begin Serial
   Serial.begin(9600);
@@ -41,8 +43,8 @@ void setup() {
     FIRE.write(FIRE_RESET);
 
     //Setup Global Angle-Tracking variables
-    int VerticalServo = ANGLE_RESET;
-    int HorizontalServo = ANGLE_RESET;
+    VerticalServo = ANGLE_RESET;
+    HorizontalServo = ANGLE_RESET;
     int MotorSpeed = BASE_SPEED;
 }
 
@@ -53,12 +55,17 @@ void loop() {
   // read from port 1, send to port 0:
   if (Serial.available() > 0) {
     inByte = Serial.readString();
+    inByte.trim(); // remove any whitespaces
   }
+
+  if(inByte.length() == 0) return; // Skip if nothing was read
 
   DeserializationError error = deserializeJson(doc, inByte);
 
   if (error) {
-    Response("Deserialization Error: " + error.f_str(), false);
+    Response("Deserialization Error: " + String(error.f_str()), false);
+    inByte = "";  // Clear input after error
+    return;
   }
 
   String incomingCommand = doc["action"];
@@ -85,7 +92,7 @@ void loop() {
     Fire();
     incomingCommand = "";
   }
-
+  inByte = "";
 }
 
 void MoveUp(int degree){
@@ -152,7 +159,6 @@ void Fire(){
   FIRE.detach();
 
   Response("Fire Successful", true);
-
 }
 
 String Response(String message, bool successful){
@@ -160,5 +166,8 @@ String Response(String message, bool successful){
   docSuccess["success"] = successful;
   docSuccess["message"] = message;
 
-  Serial.println(serializeJson(docSuccess, Serial));
+  String output;
+  serializeJson(docSuccess, output);
+  Serial.println(output);
+  return output;
 }
