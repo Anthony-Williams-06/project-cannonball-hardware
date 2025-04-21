@@ -25,8 +25,6 @@ int HORIZONTAL_LOWER_LIMIT = 0;
 int VerticalServo;
 int HorizontalServo;
 
-int BASE_SPEED = 0;
-
 void setup() {
   //Begin Serial
   Serial.begin(9600);
@@ -45,7 +43,6 @@ void setup() {
     //Setup Global Angle-Tracking variables
     VerticalServo = ANGLE_RESET;
     HorizontalServo = ANGLE_RESET;
-    int MotorSpeed = BASE_SPEED;
 }
 
 void loop() {
