@@ -95,52 +95,52 @@ void loop() {
 void MoveUp(int degree){
   if ((VerticalServo + degree) > VERTICAL_UPPER_LIMIT){
     //return error
-    Response("Move Up Delta amount too high: " + String(degree) + " degrees", false);
+    Response("Move Up Delta amount too high: Position At " + String(VerticalServo) + " degrees", false);
   }
   else{
     //go ahead and run command
     VerticalServo += degree;
     VERTICAL.write(VerticalServo);
-    Response("Move Down Successful: " + String(degree) + " degrees", true);
+    Response("Move Up Successful: Position At " + String(VerticalServo) + " degrees", true);
   }
 }
 
 void MoveDown(int degree){
   if ((VerticalServo - degree) < VERTICAL_LOWER_LIMIT){
     //return error
-    Response("Move Down Delta amount too high: " + String(degree) + " degrees", false);
+    Response("Move Down Delta amount too high: Position At " + String(VerticalServo) + " degrees", false);
   }
   else{
     //go ahead and run command
     VerticalServo -= degree;
     VERTICAL.write(VerticalServo);
-    Response("Move Down Successful: " + String(degree) + " degrees", true);
+    Response("Move Down Successful: Position At " + String(VerticalServo) + " degrees", true);
   }
 }
 
 void MoveRight(int degree){
   if ((HorizontalServo + degree) > HORIZONTAL_UPPER_LIMIT){
     //return error
-    Response("Move Right Delta amount too high: " + String(degree) + " degrees", false);
+    Response("Move Right Delta amount too high: Position At " + String(HorizontalServo) + " degrees", false);
   }
   else{
     //go ahead and run command
     HorizontalServo += degree;
-    VERTICAL.write(HorizontalServo);
-    Response("Move Right Successful: " + String(degree) + " degrees", true);
+    HORIZONTAL.write(HorizontalServo);
+    Response("Move Right Successful: Position At " + String(HorizontalServo) + " degrees", true);
   }
 }
 
 void MoveLeft(int degree){
   if ((HorizontalServo - degree) < HORIZONTAL_LOWER_LIMIT){
     //return error
-    Response("Move Left Delta amount too high: " + String(degree) + " degrees", false);
+    Response("Move Left Delta amount too high: Position At " + String(HorizontalServo) + " degrees", false);
   }
   else{
     //go ahead and run command
     HorizontalServo -= degree;
-    VERTICAL.write(HorizontalServo);
-    Response("Move Left Successful", true);
+    HORIZONTAL.write(HorizontalServo);
+    Response("Move Left Successful: Position At " + String(HorizontalServo) + " degrees", true);
   }
 }
 
