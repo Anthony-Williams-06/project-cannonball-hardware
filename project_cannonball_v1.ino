@@ -33,12 +33,10 @@ void setup() {
   //Attach Servo Pins to Servo Objects and reset
     VERTICAL.attach(PIN_VERTICAL);
     HORIZONTAL.attach(PIN_HORIZONTAL);
-    FIRE.attach(PIN_FIRE);
 
     //Reset all servo angles
     VERTICAL.write(ANGLE_RESET);
     HORIZONTAL.write(ANGLE_RESET);
-    FIRE.write(FIRE_RESET);
 
     //Setup Global Angle-Tracking variables
     VerticalServo = ANGLE_RESET;
@@ -118,7 +116,7 @@ void MoveDown(int degree){
   }
 }
 
-void MoveRight(int degree){
+void MoveLeft(int degree){
   if ((HorizontalServo + degree) > HORIZONTAL_UPPER_LIMIT){
     //return error
     Response("Move Right Delta amount too high: Position At " + String(HorizontalServo) + " degrees", false);
@@ -131,7 +129,7 @@ void MoveRight(int degree){
   }
 }
 
-void MoveLeft(int degree){
+void MoveRight(int degree){
   if ((HorizontalServo - degree) < HORIZONTAL_LOWER_LIMIT){
     //return error
     Response("Move Left Delta amount too high: Position At " + String(HorizontalServo) + " degrees", false);
@@ -148,11 +146,9 @@ void Fire(){
   
   FIRE.attach(PIN_FIRE);
   FIRE.write(0);
-  delay(3000);
-  FIRE.write(90);
-  delay(500);
+  delay(460);
   FIRE.write(180);
-  delay(3000);
+  delay(460);
   FIRE.detach();
 
   Response("Fire Successful", true);
