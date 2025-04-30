@@ -119,26 +119,26 @@ void MoveDown(int degree){
 void MoveLeft(int degree){
   if ((HorizontalServo + degree) > HORIZONTAL_UPPER_LIMIT){
     //return error
-    Response("Move Right Delta amount too high: Position At " + String(HorizontalServo) + " degrees", false);
+    Response("Move Left Delta amount too high: Position At " + String(HorizontalServo) + " degrees", false);
   }
   else{
     //go ahead and run command
     HorizontalServo += degree;
     HORIZONTAL.write(HorizontalServo);
-    Response("Move Right Successful: Position At " + String(HorizontalServo) + " degrees", true);
+    Response("Move Left Successful: Position At " + String(HorizontalServo) + " degrees", true);
   }
 }
 
 void MoveRight(int degree){
   if ((HorizontalServo - degree) < HORIZONTAL_LOWER_LIMIT){
     //return error
-    Response("Move Left Delta amount too high: Position At " + String(HorizontalServo) + " degrees", false);
+    Response("Move Right Delta amount too high: Position At " + String(HorizontalServo) + " degrees", false);
   }
   else{
     //go ahead and run command
     HorizontalServo -= degree;
     HORIZONTAL.write(HorizontalServo);
-    Response("Move Left Successful: Position At " + String(HorizontalServo) + " degrees", true);
+    Response("Move Right Successful: Position At " + String(HorizontalServo) + " degrees", true);
   }
 }
 
